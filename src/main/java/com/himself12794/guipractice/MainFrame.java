@@ -3,75 +3,118 @@ package com.himself12794.guipractice;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
-import sun.audio.AudioPlayer;
-import sun.audio.AudioStream;
+import javax.swing.JSlider;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 2097142934919914076L;
 	
-	private JButton jbtCalcResults = new JButton("Click for Prize");
+	// Buttons
+	//private final JButton trollButton 		= new JButton("Click for Prize");
+	private final JButton playPauseButton 	= new JButton("Play / Pause");
+	private final JMenuBar menuBar			= new JMenuBar();
+	private final JMenu fileMenu			= new JMenu("File");
+	private final JMenuItem fileOption		= new JMenuItem("Open .wav file");
 
-	private ImagePanel imgPan;
-	private ImageIcon img = new ImageIcon("images/icon.gif");
+	// Panels
+	private final JPanel imagePanel 		= new ImagePanel("images/trollface.jpg");
+	private final JPanel audioButtonPanel 	= new JPanel(new FlowLayout(FlowLayout.CENTER));
 	
-	public MainFrame() {
-		
-		JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		p1.add(jbtCalcResults);
-		
-		imgPan = new ImagePanel();
-		imgPan.setVisible(false);
-		
-		
-		add(imgPan);
-		add(p1, BorderLayout.SOUTH);
-		
-		jbtCalcResults.addActionListener(i -> {
-			setBounds(0, 0, 625, 650);
-			imgPan.setVisible(true);
-			playSound();
-			p1.setVisible(false);
+	// Image Icon
+	private final ImageIcon img 			= new ImageIcon("images/icon.gif");
+	
+	// Audio
+	//private static final Clip clip				= loadSoundClip("audio/troll_song.wav");
+	private final JLabel audioLocation 			= new JLabel(String.format(SoundMonitor.LENGTH_FORMAT, 0, 0, 0, 0));
+	private final JSlider audioPositionSlider 	= new JSlider(0, 1, 0);
+	private final SoundMonitor soundMonitor;
+	
+	public MainFrame() throws LineUnavailableException {
+
+		soundMonitor = new SoundMonitor(null, audioLocation, audioPositionSlider, this);
+		//soundMonitor.loadNewFile(loadWaveFile());
+		menuBar.add(fileMenu);
+		setJMenuBar(menuBar);
+		fileMenu.add(fileOption);
+		fileOption.addActionListener(l -> {
+			
+			File file = loadWaveFile();
+			
+			if (file != null) {
+
+				soundMonitor.loadNewFile(file);
+				
+			}
 		});
 		
+		audioButtonPanel.add(playPauseButton);
+		audioButtonPanel.add(audioLocation);
+		audioButtonPanel.add(audioPositionSlider);
+		
+		playPauseButton.addActionListener(e -> {
+			synchronized (soundMonitor.getAudioClip()) {
+				if (soundMonitor.getAudioClip().isRunning()) {
+					soundMonitor.getAudioClip().stop();
+				} else {
+					soundMonitor.getAudioClip().start();
+				}
+			}
+			
+		});
+		
+		imagePanel.setVisible(false);
+		
+		add(audioButtonPanel, BorderLayout.SOUTH);
 		setIconImage(img.getImage());
+		
+		setBounds(0, 0, audioButtonPanel.getWidth(), audioButtonPanel.getHeight());
+		soundMonitor.start();
 	}
 	
-	public static void main(String[] args) {
+	public File loadWaveFile() {
+		final JFileChooser fc = new JFileChooser();
+		
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("WAV File", "wav");
+		fc.setFileFilter(filter);
+		
+        int returnVal = fc.showOpenDialog(this);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            return file;
+        } else {
+        	return null;
+        }
+	}
+	
+	public static void main(String[] args) throws LineUnavailableException {
 		MainFrame frame = new MainFrame();
 		frame.pack();
-		frame.setTitle("Trololol");
+		//frame.setTitle("Trololol");
 		frame.setLocationRelativeTo(null);
-		frame.setBounds(0, 0, 100, 100);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
 	
-	public void playSound() {
-		try {
-		    File soundFile = new File("audio/troll_song.wav");
-		    System.out.println(soundFile.exists());
-		    InputStream in = new FileInputStream(soundFile);
-
-		    // create an audiostream from the inputstream
-		    AudioStream audioStream = new AudioStream(in);
-		    System.out.println(audioStream.getLength());
-		    // play the audio clip with the audioplayer class
-		    AudioPlayer.player.start(audioStream);
-		    
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void notifyError(String title, String error) {
+		JOptionPane.showMessageDialog(this, error, title, JOptionPane.ERROR_MESSAGE);
+	}
+	
+	public void notifyWarning(String title, String error) {
+		JOptionPane.showMessageDialog(this, error, title, JOptionPane.WARNING_MESSAGE);
 	}
 
 }

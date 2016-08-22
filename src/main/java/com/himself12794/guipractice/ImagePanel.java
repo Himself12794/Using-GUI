@@ -1,30 +1,27 @@
 package com.himself12794.guipractice;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
+import java.awt.Image;
+import java.awt.Toolkit;
+
 import javax.swing.JPanel;
 
 public class ImagePanel extends JPanel{
 	
 	private static final long serialVersionUID = 7904889758413996800L;
 	
-	private BufferedImage image;
+	private Image image;
 
-    public ImagePanel() {
-       try {                
-          image = ImageIO.read(new File("images/trollface.jpg"));
-       } catch (IOException ex) {
-            // handle exception...
-       }
+    public ImagePanel(String location) {
+    	image = Toolkit.getDefaultToolkit().getImage(location);
+    	setSize(new Dimension(this.image.getHeight(null), this.image.getWidth(null)));
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.drawImage(image, 0, 0, null); // see javadoc for more info on the parameters            
+    	super.paintComponent(g);
+    	g.drawImage(image, 0, 0, null);
     }
 
 }
