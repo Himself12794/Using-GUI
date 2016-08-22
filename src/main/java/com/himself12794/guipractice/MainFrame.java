@@ -22,6 +22,8 @@ public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 2097142934919914076L;
 	
+	private static final FileNameExtensionFilter SOUND_FILE_FILTER = new FileNameExtensionFilter("WAV File", "wav");
+	
 	// Buttons
 	//private final JButton trollButton 		= new JButton("Click for Prize");
 	private final JButton playPauseButton 	= new JButton("Play / Pause");
@@ -37,7 +39,6 @@ public class MainFrame extends JFrame {
 	private final ImageIcon img 			= new ImageIcon("images/icon.gif");
 	
 	// Audio
-	//private static final Clip clip				= loadSoundClip("audio/troll_song.wav");
 	private final JLabel audioLocation 			= new JLabel(String.format(SoundMonitor.LENGTH_FORMAT, 0, 0, 0, 0));
 	private final JSlider audioPositionSlider 	= new JSlider(0, 1, 0);
 	private final SoundMonitor soundMonitor;
@@ -87,8 +88,7 @@ public class MainFrame extends JFrame {
 	public File loadWaveFile() {
 		final JFileChooser fc = new JFileChooser();
 		
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("WAV File", "wav");
-		fc.setFileFilter(filter);
+		fc.setFileFilter(SOUND_FILE_FILTER);
 		
         int returnVal = fc.showOpenDialog(this);
 
@@ -103,10 +103,17 @@ public class MainFrame extends JFrame {
 	public static void main(String[] args) throws LineUnavailableException {
 		MainFrame frame = new MainFrame();
 		frame.pack();
-		//frame.setTitle("Trololol");
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
+		
+		if (args.length > 0) {
+			File file = new File(args[0]);
+			if (file.exists() && SOUND_FILE_FILTER.accept(file)) {
+				frame.soundMonitor.loadNewFile(file);
+			}
+		}
+		
 	}
 	
 	public void notifyError(String title, String error) {

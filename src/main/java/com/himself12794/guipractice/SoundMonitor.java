@@ -65,6 +65,8 @@ public class SoundMonitor extends Thread implements LineListener, MouseListener,
 						value = this.valueForYPosition(slider.getMousePosition().y);
 					}
 					slider.setValue(value);
+					
+					slider.setValueIsAdjusting(true);
 				}
 			});
 		}
