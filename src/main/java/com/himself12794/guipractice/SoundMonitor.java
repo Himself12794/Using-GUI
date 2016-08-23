@@ -66,8 +66,8 @@ public class SoundMonitor extends Thread implements LineListener, MouseListener,
 					}
 					slider.setValue(value);
 					
-					slider.setValueIsAdjusting(true);
 				}
+				
 			});
 		}
 	}
@@ -106,7 +106,7 @@ public class SoundMonitor extends Thread implements LineListener, MouseListener,
 			synchronized (mySlider) {
 				mySlider.setMaximum((int) (clip.getMicrosecondLength() / (1000)));
 			}
-			mainFrame.setTitle(audioFile.getName());
+			mainFrame.setTitle(MainFrame.APP_NAME + " - " + audioFile.getName());
 			recalculatePositionFromClip();
 			clip.start();
 		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {

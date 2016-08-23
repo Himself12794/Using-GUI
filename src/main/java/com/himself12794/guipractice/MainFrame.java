@@ -24,6 +24,8 @@ public class MainFrame extends JFrame {
 	
 	private static final FileNameExtensionFilter SOUND_FILE_FILTER = new FileNameExtensionFilter("WAV File", "wav");
 	
+	public static final String APP_NAME = "Simple Media Player";
+	
 	// Buttons
 	//private final JButton trollButton 		= new JButton("Click for Prize");
 	private final JButton playPauseButton 	= new JButton("Play / Pause");
@@ -46,7 +48,6 @@ public class MainFrame extends JFrame {
 	public MainFrame() throws LineUnavailableException {
 
 		soundMonitor = new SoundMonitor(null, audioLocation, audioPositionSlider, this);
-		//soundMonitor.loadNewFile(loadWaveFile());
 		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
 		fileMenu.add(fileOption);
@@ -102,6 +103,7 @@ public class MainFrame extends JFrame {
 	
 	public static void main(String[] args) throws LineUnavailableException {
 		MainFrame frame = new MainFrame();
+		frame.setTitle(APP_NAME);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
